@@ -2,14 +2,15 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import { TelegramClient } from "telegram";
-import { StringSession } from "telegram/sessions";
 import readline from "readline";
 import log from "npmlog";
 import fs from "fs/promises";
+import StringSession, { save } from "./components/utils/session";
 
-const apiId = process.env.TELEGRAM_API_ID ? Number(process.env.TELEGRAM_API_ID) : 123456;
+const apiId = process.env.TELEGRAM_API_ID
+  ? Number(process.env.TELEGRAM_API_ID)
+  : 123456;
 const apiHash = process.env.TELEGRAM_API_HASH || "your_api_hash_here";
-const stringSession = new StringSession("");
 const commandPrefix = process.env.COMMAND_PREFIX || "!";
 const botName = process.env.PROJECT_CANIS_ALIAS || "Canis";
 const autoReload = process.env.AUTO_RELOAD === "true";
@@ -23,6 +24,8 @@ const rl = readline.createInterface({
 });
 
 (async () => {
+  const stringSession = await StringSession();
+
   const client = new TelegramClient(stringSession, apiId, apiHash, {
     connectionRetries: 5,
   });
@@ -45,13 +48,7 @@ const rl = readline.createInterface({
 
   log.info("Bot", "Client started successfully");
 
-   
-  const tempDir = "./.session";
-  await fs.mkdir(tempDir, { recursive: true });
-
-  const tempPath = `${tempDir}/telegram_session.json`;
-  await fs.writeFile(tempPath, stringSession.save() || "");
+  save(stringSession);
 
   await client.sendMessage("me", { message: "Hello!" });
-
 })();

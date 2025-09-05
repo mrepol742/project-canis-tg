@@ -1,7 +1,7 @@
 import os from "os";
-import timestamp from "../components/utils/timestamp";
+import timestamp from "@/components/utils/timestamp";
 import log from "npmlog";
-import message from "../components/events/message";
+import message from "@/components/events/message";
 
 export const info = {
   command: "uptime",

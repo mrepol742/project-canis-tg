@@ -1,5 +1,5 @@
 import log from "npmlog";
-import { commands } from "../../index";
+import { commands } from "@/index";
 
 const commandPrefix = process.env.COMMAND_PREFIX || "!";
 const commandPrefixLess = process.env.COMMAND_PREFIX_LESS === "true";

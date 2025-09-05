@@ -1,7 +1,7 @@
 import log from "npmlog"
 import fs from "fs";
 import path from "path";
-import { commands } from "../../index";
+import { commands } from "@/index";
 
 const commandsPath = path.join(__dirname, "..", "..", "commands");
 

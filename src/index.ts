@@ -6,9 +6,9 @@ import readline from "readline";
 import log from "npmlog";
 import fs from "fs";
 import path from "path";
-import loader from "./components/utils/loader";
-import StringSession, { save } from "./components/utils/session";
-import message from "./components/events/message";
+import loader from "@/components/utils/loader";
+import StringSession, { save } from "@/components/utils/session";
+import message from "@/components/events/message";
 
 const apiId = process.env.TELEGRAM_API_ID
   ? Number(process.env.TELEGRAM_API_ID)

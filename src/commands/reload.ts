@@ -2,9 +2,9 @@ import axios from "axios";
 import log from "npmlog";
 import fs from "fs";
 import path from "path";
-import { commands } from "../index";
-import Loader from "../components/utils/loader";
-import message from "../components/events/message";
+import { commands } from "@/index";
+import Loader from "@/components/utils/loader";
+import message from "@/components/events/message";
 
 export const info = {
   command: "reload",

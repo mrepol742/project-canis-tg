@@ -3,7 +3,7 @@ import log from "npmlog";
 import fs from "fs";
 import path from "path";
 import { commands } from "@/index";
-import Loader from "@/components/utils/loader";
+import Loader from "@/components/utils/cmd/loader";
 import message from "@/components/events/message";
 
 export const info = {

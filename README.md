@@ -2,12 +2,12 @@
 
 A version of canis from WhatsApp!
 
-> ⚠️ **Warning:**  
+> ⚠️ **Warning:**
 > This repository is for educational and entertainment purposes only.
 > Canis is not affiliated with Telegram.
 > Use at your own risk, your Telegram account may be subject to suspension or bans.
 
-> ⚠️ **Warning:**  
+> ⚠️ **Warning:**
 > Spaghetting code ahead
 
 ## Supported AI Providers
@@ -20,38 +20,47 @@ Canis supports multiple AI providers out of the box:
 - [Gemini (Google)](https://ai.google.dev/gemini)
 - [Ollama](https://ollama.com/)
 
-Configure your preferred provider in the `.env` file.
-
 ## Prerequisites
 
 - Node.js (>=24)
-- Telegram
+- MySQL
+
+  You can changed the db provider in `prisma/schema.prisma`
+
+- Redis/Valkey
+- Telegram Account
+- Chrome browser
 
 ## Getting started
 
-1. **Clone repo**  
+1. **Clone repo**
 
-   ```bash
+   ```sh
    git clone https://github.com/mrepol742/project-canis-tg.git
    cd project-canis-tg
 
 2. **Install dependencies**
 
-   ```
+   ```sh
    npm install
    ```
 
 3. **Setup environment variables**
 
-   ```
+   ```sh
    cp .env.example .env
+   # Configure your AI Provider, models and other necessary preferences.
    ```
 
-   Edit .env with your Telegram credentials, DB connection, and other keys.
+4. **Run Migration**
 
-4. **Run**
-
+   ```sh
+   npx prisma migrate dev
    ```
+
+5. **Run**
+
+   ```sh
    npm run start
    ```
 

@@ -6,9 +6,10 @@ import readline from "readline";
 import log from "npmlog";
 import fs from "fs";
 import path from "path";
-import loader from "@/components/utils/loader";
+import loader, { mapCommandsBackground } from "@/components/utils/cmd/loader";
 import StringSession, { save } from "@/components/utils/session";
 import message from "@/components/events/message";
+import watcher from "@/components/utils/cmd/watcher";
 
 const apiId = process.env.TELEGRAM_API_ID
   ? Number(process.env.TELEGRAM_API_ID)
@@ -21,6 +22,12 @@ const commandsPath = path.join(__dirname, "commands");
 
 log.info("Bot", `Initiating ${botName}...`);
 log.info("Bot", `prefix: ${commandPrefix}`);
+
+if (!process.env.DATABASE_URL) {
+  throw new Error(
+    "DATABASE_URL is not set in the environment variables.\n This is required for the bot to function properly.",
+  );
+}
 
 const commands: Record<
   string,
@@ -35,19 +42,10 @@ const commands: Record<
   }
 > = {};
 
-fs.readdirSync(commandsPath).forEach((file: string) => loader(file));
+mapCommandsBackground();
 
 // Watch for changes
-if (autoReload)
-  fs.watch(commandsPath, (eventType: string, filename: string | null) => {
-    if (filename && /\.js$|\.ts$/.test(filename)) {
-      try {
-        loader(filename);
-      } catch (err) {
-        log.error("Loader", `Failed to reload command: ${filename}`, err);
-      }
-    }
-  });
+if (autoReload) watcher(commandsPath);
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -64,15 +62,15 @@ const rl = readline.createInterface({
   await client.start({
     phoneNumber: async () =>
       new Promise((resolve) =>
-        rl.question("Please enter your number: ", resolve)
+        rl.question("Please enter your number: ", resolve),
       ),
     password: async () =>
       new Promise((resolve) =>
-        rl.question("Please enter your password: ", resolve)
+        rl.question("Please enter your password: ", resolve),
       ),
     phoneCode: async () =>
       new Promise((resolve) =>
-        rl.question("Please enter the code you received: ", resolve)
+        rl.question("Please enter the code you received: ", resolve),
       ),
     onError: (err) => log.error("Client", `Error: ${err}`),
   });

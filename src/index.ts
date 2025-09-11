@@ -10,6 +10,8 @@ import loader, { mapCommandsBackground } from "@/components/utils/cmd/loader";
 import StringSession, { save } from "@/components/utils/session";
 import message from "@/components/events/message";
 import watcher from "@/components/utils/cmd/watcher";
+import "./components/process";
+import server from "./components/server";
 
 const apiId = process.env.TELEGRAM_API_ID
   ? Number(process.env.TELEGRAM_API_ID)

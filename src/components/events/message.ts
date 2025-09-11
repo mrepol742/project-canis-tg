@@ -42,7 +42,13 @@ export default async function (update: any, client: any) {
    * Execute the command handler.
    */
   try {
-    update.msg = message;
+    // this is for cross compatibility
+    update.body = message;
+    update.reply = async (message: string) => {
+      return await client.sendMessage("me", {
+        message: message,
+      });
+    };
     await handler.exec(update, client);
   } catch (error: any) {
     if (error.response) {

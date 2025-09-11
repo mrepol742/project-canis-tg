@@ -1,7 +1,6 @@
+import { Message } from "../../types/message";
 import os from "os";
-import timestamp from "@/components/utils/timestamp";
-import log from "npmlog";
-import message from "@/components/events/message";
+import timestamp from "../components/utils/timestamp";
 
 export const info = {
   command: "uptime",
@@ -12,21 +11,19 @@ export const info = {
   cooldown: 5000,
 };
 
-export default async function (update: any, client: any) {
-  if (!/^uptime\b/i.test(update.msg)) return;
+export default async function (msg: Message) {
+  if (!/^uptime\b/i.test(msg.body)) return;
 
   const statsMessage = `
-\`${timestamp(process.uptime())}\`
+      \`${timestamp(process.uptime())}\`
 
-ID: #${process.pid}
-LA: ${os
-    .loadavg()
-    .map((n) => n.toFixed(2))
-    .join(", ")}
-Node.js: ${process.version}
-`.trim();
+      ID: #${process.pid}
+      LA: ${os
+        .loadavg()
+        .map((n) => n.toFixed(2))
+        .join(", ")}
+      Node.js: ${process.version}
+      `;
 
-  await client.sendMessage("me", {
-    message: statsMessage,
-  });
+  await msg.reply(statsMessage);
 }

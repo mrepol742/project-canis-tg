@@ -1,10 +1,10 @@
+import { Message } from "../../types/message";
 import axios from "axios";
-import log from "npmlog";
+import log from "../components/utils/log";
 import fs from "fs";
 import path from "path";
-import { commands } from "@/index";
-import Loader from "@/components/utils/cmd/loader";
-import message from "@/components/events/message";
+import { commands } from "../index";
+import Loader from "../components/utils/cmd/loader";
 
 export const info = {
   command: "reload",
@@ -15,14 +15,12 @@ export const info = {
   cooldown: 5000,
 };
 
-export default async function (update: any, client: any) {
-  const query = update.msg.replace(/^reload\b\s*/i, "").trim();
+export default async function (msg: Message) {
+  const query = msg.body.replace(/^reload\b\s*/i, "").trim();
 
   if (query.length !== 0) {
     if (!commands[query.toLocaleLowerCase()]) {
-      await client.sendMessage("me", {
-        message: `Command "${query}" not found.`,
-      });
+      await msg.reply(`Command "${query}" not found.`);
       return;
     }
 
@@ -39,19 +37,19 @@ export default async function (update: any, client: any) {
     }
 
     if (!found)
-      await client.sendMessage("me", {
-        message: `
-    Failed to load
+      await msg.reply(
+        `
+    \`Failed to load\`
     ${query}
-    `,
-      });
+    `
+      );
     if (found)
-      await client.sendMessage("me", {
-        message: `
-      Successfully reloaded
+      await msg.reply(
+        `
+      \`Successfully reloaded\`
       ${query}
-      `,
-      });
+      `
+      );
     return;
   }
 
@@ -75,7 +73,7 @@ export default async function (update: any, client: any) {
   });
 
   let text = `
-\`Reloaded\`
+  \`Reloaded\`
   ${count} commands
   `;
 
@@ -86,7 +84,5 @@ export default async function (update: any, client: any) {
   `;
   }
 
-  await client.sendMessage("me", {
-    message: text,
-  });
+  await msg.reply(text);
 }

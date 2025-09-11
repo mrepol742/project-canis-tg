@@ -1,5 +1,6 @@
 import log from "npmlog";
 import { commands } from "@/index";
+import Font from "@/components/utils/font"
 
 const commandPrefix = process.env.COMMAND_PREFIX || "!";
 const commandPrefixLess = process.env.COMMAND_PREFIX_LESS === "true";
@@ -46,7 +47,7 @@ export default async function (update: any, client: any) {
     update.body = message;
     update.reply = async (message: string) => {
       return await client.sendMessage("me", {
-        message: message,
+        message: Font(message),
       });
     };
     await handler.exec(update, client);

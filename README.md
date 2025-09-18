@@ -29,7 +29,6 @@ Canis supports multiple AI providers out of the box:
 
 - Redis/Valkey
 - Telegram Account
-- Chrome browser
 
 ## Getting started
 

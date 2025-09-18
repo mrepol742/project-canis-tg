@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
+import { checkRequirements } from "./components/utils/requirements";
 import { TelegramClient } from "telegram";
 import readline from "readline";
 import log from "./components/utils/log";
@@ -17,6 +18,7 @@ import MemoryMonitor from "./components/utils/memMonitor";
 
 const monitor = new MemoryMonitor({ interval: 30000 });
 monitor.start();
+checkRequirements();
 
 const apiId = process.env.TELEGRAM_API_ID
   ? Number(process.env.TELEGRAM_API_ID)

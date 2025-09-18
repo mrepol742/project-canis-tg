@@ -1,9 +1,9 @@
 import { Message } from "../../types/message";
-import axios from "axios";
+import axios from "../components/axios";
 import log from "../components/utils/log";
 import fs from "fs";
 import path from "path";
-import { commands } from "../index";
+import { commands, commandDirs } from "../components/utils/cmd/loader";
 import Loader from "../components/utils/cmd/loader";
 
 export const info = {
@@ -11,7 +11,7 @@ export const info = {
   description: "Reload a specific command or all commands.",
   usage: "reload [command]",
   example: "reload ai",
-  role: "admin",
+  role: "user",
   cooldown: 5000,
 };
 
@@ -20,36 +20,26 @@ export default async function (msg: Message) {
 
   if (query.length !== 0) {
     if (!commands[query.toLocaleLowerCase()]) {
-      await msg.reply(`Command "${query}" not found.`);
+      await msg.reply(`Command \`${query}\` not found.`);
       return;
     }
 
-    const commandsPath = path.join(__dirname, "..", "commands");
     const possibleExtensions = [".ts", ".js"];
     let found = false;
 
     for (const ext of possibleExtensions) {
-      const filePath = path.join(commandsPath, `${query}${ext}`);
-      if (fs.existsSync(filePath)) {
-        Loader(`${query}${ext}`);
+      for (const dir of commandDirs) {
+        Loader(`${query}${ext}`, dir);
         found = true;
       }
     }
 
-    if (!found)
-      await msg.reply(
-        `
-    \`Failed to load\`
-    ${query}
-    `
-      );
-    if (found)
-      await msg.reply(
-        `
-      \`Successfully reloaded\`
-      ${query}
-      `
-      );
+    if (!found) {
+      await msg.reply(`\`Failed to load\`\n${query}`);
+    } else {
+      await msg.reply(`\`Successfully reloaded\`\n${query}`);
+    }
+
     return;
   }
 
@@ -57,20 +47,24 @@ export default async function (msg: Message) {
   let count = 0;
   const newCommands: string[] = [];
   const removeCommands: string[] = [];
-  const commandsPath = path.join(__dirname, "..", "commands");
 
-  fs.readdirSync(commandsPath).forEach((file) => {
-    if (/\.js$|\.ts$/.test(file)) {
-      const commandName = file.replace(/\.(js|ts)$/, "");
-      if (!commands[commandName]) {
-        newCommands.push(commandName);
-      } else {
-        removeCommands.push(commandName);
+  for (const dir of commandDirs) {
+    const files = fs.readdirSync(dir);
+    for (const file of files) {
+      if (/\.js$|\.ts$/.test(file)) {
+        const commandName = file.replace(/\.(js|ts)$/, "");
+
+        if (!commands[commandName]) {
+          newCommands.push(commandName);
+        } else {
+          removeCommands.push(commandName);
+        }
+
+        await Loader(file, dir);
+        count++;
       }
-      Loader(file);
-      count++;
     }
-  });
+  }
 
   let text = `
   \`Reloaded\`

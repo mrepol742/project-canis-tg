@@ -1,12 +1,26 @@
-import log from "npmlog";
+import log from "../log";
 import { promises as fs } from "fs";
 import path from "path";
-import { commands } from "@/index";
 import { exec } from "child_process";
+import LoadingBar from "../loadingBar";
 import util from "util";
+import { Message } from "../../../../types/message";
 const execPromise = util.promisify(exec);
+const basePath = path.join(__dirname, "..", "..", "..", "commands");
 
-const commandsPath = path.join(__dirname, "..", "..", "..", "commands");
+export const commandDirs = [basePath, path.join(basePath, "private")];
+export const commands: Record<
+  string,
+  {
+    command: string;
+    description: string;
+    usage: string;
+    example: string;
+    role: string;
+    cooldown: number;
+    exec: (msg: Message) => void;
+  }
+> = {};
 
 async function ensureDependencies(
   dependencies: { name: string; version: string }[],
@@ -37,9 +51,9 @@ async function ensureDependencies(
   }
 }
 
-export default async function loader(file: string, customPath?: string) {
+export default async function loader(file: string, customPath: string) {
   if (/\.js$|\.ts$/.test(file)) {
-    const filePath = path.join(customPath || commandsPath, file);
+    const filePath = path.join(customPath, file);
 
     const resolvedPath = path.resolve(filePath);
     if (require.cache[resolvedPath]) {
@@ -66,16 +80,43 @@ export default async function loader(file: string, customPath?: string) {
         cooldown: commandModule.info.cooldown || 5000,
         exec: commandModule.default,
       };
-      log.info("Loader", `Loaded command: ${commandModule.info.command}`);
     }
   }
 }
 
 export async function mapCommands() {
-  const files = await fs.readdir(commandsPath);
-  await Promise.all(files.map((file) => loader(file)));
-}
+  let allFiles: [string, string][] = [];
 
-export function mapCommandsBackground() {
-  mapCommands().catch((err) => log.error("MapCommandLoader", err));
+  for (const dir of commandDirs) {
+    const files = await fs.readdir(dir);
+
+    const tuples: [string, string][] = files.map(
+      (f) => [f, dir] as [string, string],
+    );
+    allFiles = [...allFiles, ...tuples];
+  }
+
+  const total = allFiles.length;
+  if (total === 0) {
+    log.info("Loader", "No commands found.");
+    return;
+  }
+
+  const bar = LoadingBar(
+    "Loading Commands | {bar} | {value}/{total} {command}",
+  );
+  bar.start(total, 0, { command: "" });
+
+  for (const [file, dir] of allFiles) {
+    try {
+      await loader(file, dir);
+      bar.increment({ command: file });
+    } catch (err) {
+      log.error("Loader", `Failed to load ${file}`, err);
+      bar.increment({ command: file });
+    }
+  }
+
+  bar.stop();
+  log.info("Loader", "All commands loaded.");
 }

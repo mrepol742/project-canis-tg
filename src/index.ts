@@ -3,10 +3,10 @@ dotenv.config();
 
 import { TelegramClient } from "telegram";
 import readline from "readline";
-import log from "npmlog";
+import log from "./components/utils/log";
 import fs from "fs";
 import path from "path";
-import loader, { mapCommandsBackground } from "@/components/utils/cmd/loader";
+import { mapCommands } from "./components/utils/cmd/loader";
 import StringSession, { save } from "@/components/utils/session";
 import message from "@/components/events/message";
 import watcher from "@/components/utils/cmd/watcher";
@@ -25,29 +25,9 @@ const commandsPath = path.join(__dirname, "commands");
 log.info("Bot", `Initiating ${botName}...`);
 log.info("Bot", `prefix: ${commandPrefix}`);
 
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL is not set in the environment variables.\n This is required for the bot to function properly.",
-  );
-}
-
-const commands: Record<
-  string,
-  {
-    command: string;
-    description: string;
-    usage: string;
-    example: string;
-    role: string;
-    cooldown: number;
-    exec: (update: any, client: any) => void;
-  }
-> = {};
-
-mapCommandsBackground();
-
+mapCommands();
 // Watch for changes
-if (autoReload) watcher(commandsPath);
+if (autoReload) watcher();
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -83,5 +63,3 @@ const rl = readline.createInterface({
 
   client.addEventHandler(async (update) => await message(update, client));
 })();
-
-export { commands };

@@ -1,5 +1,5 @@
 import log from "npmlog";
-import { commands } from "@/index";
+import { commands } from "../utils/cmd/loader";
 import Font from "@/components/utils/font"
 
 const commandPrefix = process.env.COMMAND_PREFIX || "!";
@@ -16,7 +16,7 @@ export default async function (update: any, client: any) {
     .trim();
 
   const prefix = !message.startsWith(commandPrefix);
-  const senderId = update.message?.from_id?.user_id || update.message?.from_id;
+  const senderId = update.message?.peerId?.userId.value || update.message?.savedPeerId?.userId.value;
 
   /*
    * Prefix
@@ -34,9 +34,7 @@ export default async function (update: any, client: any) {
   const handler = commands[key.toLowerCase()];
   if (!handler) return
 
-  if (debug) {
-    log.info("Message", senderId, update.message?.message.slice(0, 150));
-  }
+  log.info("Message", senderId, update.message?.message.slice(0, 150));
   message = !bodyHasPrefix ? message : message.slice(commandPrefix.length);
 
   /*
@@ -50,7 +48,9 @@ export default async function (update: any, client: any) {
         message: Font(message),
       });
     };
-    await handler.exec(update, client);
+
+    handler.exec(update);
+
   } catch (error: any) {
     if (error.response) {
       const { status, headers } = error.response;

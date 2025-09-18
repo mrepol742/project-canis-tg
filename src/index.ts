@@ -12,6 +12,11 @@ import message from "@/components/events/message";
 import watcher from "@/components/utils/cmd/watcher";
 import "./components/process";
 import server from "./components/server";
+import MemoryMonitor from "./components/utils/memMonitor";
+
+
+const monitor = new MemoryMonitor({ interval: 30000 });
+monitor.start();
 
 const apiId = process.env.TELEGRAM_API_ID
   ? Number(process.env.TELEGRAM_API_ID)

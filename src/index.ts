@@ -12,7 +12,8 @@ import StringSession, { save } from "@/components/utils/session";
 import message from "@/components/events/message";
 import watcher from "@/components/utils/cmd/watcher";
 import "./components/process";
-import server from "./components/server";
+import "./components/server";
+import "./components/utils/data";
 import MemoryMonitor from "./components/utils/memMonitor";
 
 

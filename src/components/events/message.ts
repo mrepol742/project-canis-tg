@@ -1,6 +1,7 @@
 import log from "npmlog";
 import { commands } from "../utils/cmd/loader";
-import Font from "@/components/utils/font"
+import Font from "@/components/utils/font";
+import { errors } from "../utils/data";
 
 const commandPrefix = process.env.COMMAND_PREFIX || "!";
 const commandPrefixLess = process.env.COMMAND_PREFIX_LESS === "true";
@@ -16,7 +17,9 @@ export default async function (update: any, client: any) {
     .trim();
 
   const prefix = !message.startsWith(commandPrefix);
-  const senderId = update.message?.peerId?.userId.value || update.message?.savedPeerId?.userId.value;
+  const senderId =
+    update.message?.peerId?.userId.value ||
+    update.message?.savedPeerId?.userId.value;
 
   /*
    * Prefix
@@ -32,7 +35,7 @@ export default async function (update: any, client: any) {
     ? messageBody.slice(commandPrefix.length).trim()
     : messageBody;
   const handler = commands[key.toLowerCase()];
-  if (!handler) return
+  if (!handler) return;
 
   log.info("Message", senderId, update.message?.message.slice(0, 150));
   message = !bodyHasPrefix ? message : message.slice(commandPrefix.length);
@@ -50,7 +53,6 @@ export default async function (update: any, client: any) {
     };
 
     handler.exec(update);
-
   } catch (error: any) {
     if (error.response) {
       const { status, headers } = error.response;
@@ -72,28 +74,30 @@ export default async function (update: any, client: any) {
 
       if (statusMessages[status]) {
         const logFn = status === 500 ? log.error : log.warn;
-        logFn(key, statusMessages[status], { status, headers });
+        log.error(key, error);
         const text = `
-        \`${statusMessages[status]}\`
+        \`${errors[Math.floor(Math.random() * errors.length)]}\`\`
 
-          Error fetching data for "${key}" command the
-          provider returned a ${status} status code.
+          We encountered an error while processing ${key}.
+          Provider returned an error ${statusMessages[status]}.
+          We notify the developers of the issue.
+          Please try again later.
         `;
-        await client.sendMessage(
-          senderId,
-          text
-        );
+        await client.sendMessage(senderId, text);
         return;
       }
     }
-    log.error(
-      key,
-      "Unexpected error occurred while processing the request:",
-      error
-    );
-    await client.sendMessage(
-      senderId,
-      `An unexpected error occurred while processing your request for "${key}". Please try again later.`
-    );
+    log.error(key, error);
+    const text = `
+    \`${errors[Math.floor(Math.random() * errors.length)]}\`
+
+      We encountered an error while processing ${key}.
+      We notify the developers of the issue.
+      Please try again later.
+      If the problem persists, please create an issue on GitHub.
+
+      https://github.com/project-canis/issues/
+    `;
+    await client.sendMessage(senderId, text);
   }
 }

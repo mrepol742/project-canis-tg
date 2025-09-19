@@ -2,13 +2,14 @@ import log from "npmlog";
 import { commands } from "../utils/cmd/loader";
 import Font from "@/components/utils/font";
 import { errors } from "../utils/data";
+import { Api } from "telegram";
 
 const commandPrefix = process.env.COMMAND_PREFIX || "!";
 const commandPrefixLess = process.env.COMMAND_PREFIX_LESS === "true";
 const debug = process.env.DEBUG === "true";
 
-export default async function (update: any, client: any) {
-  let message = update?.message?.message;
+export default async function (event: any, client: any) {
+  let message = event?.message?.message;
   if (!message) return;
 
   message = message
@@ -17,9 +18,6 @@ export default async function (update: any, client: any) {
     .trim();
 
   const prefix = !message.startsWith(commandPrefix);
-  const senderId =
-    update.message?.peerId?.userId.value ||
-    update.message?.savedPeerId?.userId.value;
 
   /*
    * Prefix
@@ -37,7 +35,7 @@ export default async function (update: any, client: any) {
   const handler = commands[key.toLowerCase()];
   if (!handler) return;
 
-  log.info("Message", senderId, update.message?.message.slice(0, 150));
+  log.info("Message", event.message?.message.slice(0, 150));
   message = !bodyHasPrefix ? message : message.slice(commandPrefix.length);
 
   /*
@@ -45,14 +43,14 @@ export default async function (update: any, client: any) {
    */
   try {
     // this is for cross compatibility
-    update.body = message;
-    update.reply = async (message: string) => {
-      return await client.sendMessage("me", {
-        message: Font(message),
+    event.body = message;
+    event.reply = async (message: string) => {
+      return await client.sendMessage(event.chatId, {
+        message,
       });
     };
 
-    handler.exec(update);
+    handler.exec(event);
   } catch (error: any) {
     if (error.response) {
       const { status, headers } = error.response;
@@ -83,7 +81,9 @@ export default async function (update: any, client: any) {
           We notify the developers of the issue.
           Please try again later.
         `;
-        await client.sendMessage(senderId, text);
+        await client.sendMessage(event.chatId, {
+          message: text,
+        });
         return;
       }
     }
@@ -98,6 +98,8 @@ export default async function (update: any, client: any) {
 
       https://github.com/project-canis/issues/
     `;
-    await client.sendMessage(senderId, text);
+    await client.sendMessage(event.chatId, {
+      message: text,
+    });
   }
 }

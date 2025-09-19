@@ -3,6 +3,7 @@ dotenv.config();
 
 import { checkRequirements } from "./components/utils/requirements";
 import { TelegramClient } from "telegram";
+import { NewMessage } from "telegram/events";
 import readline from "readline";
 import log from "./components/utils/log";
 import fs from "fs";
@@ -69,5 +70,7 @@ const rl = readline.createInterface({
 
   save(stringSession);
 
-  client.addEventHandler(async (update) => await message(update, client));
+  client.addEventHandler(async (event) => {
+    await message(event, client)
+  }, new NewMessage({}));
 })();

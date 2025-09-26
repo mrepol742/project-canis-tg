@@ -3,6 +3,7 @@ import log from "../components/utils/log";
 import os from "os";
 import si from "systeminformation";
 import { commands } from "../components/utils/cmd/loader";
+import timestamp from "../components/utils/timestamp";
 
 export const info = {
   command: "stats",
@@ -19,7 +20,7 @@ export default async function (msg: Message) {
   // Node.js runtime stats
   const mem = process.memoryUsage();
   const cpu = process.cpuUsage();
-  const uptime = process.uptime();
+  const PROJECT_CANIS_ALIAS = process.env.PROJECT_CANIS_ALIAS || "Canis";
 
   const nodeStats = {
     rss: (mem.rss / 1024 ** 2).toFixed(2), // MB
@@ -29,7 +30,7 @@ export default async function (msg: Message) {
     arrayBuffers: (mem.arrayBuffers / 1024 ** 2).toFixed(2),
     cpuUser: (cpu.user / 1000).toFixed(2), // ms
     cpuSystem: (cpu.system / 1000).toFixed(2), // ms
-    uptime: `${Math.floor(uptime / 60)}m ${Math.floor(uptime % 60)}s`,
+    uptime: process.uptime(),
     nodeVersion: process.version,
     platform: process.platform,
   };
@@ -41,32 +42,39 @@ export default async function (msg: Message) {
     cpu: os.cpus(),
   };
 
-  const [gpuInfo, osInfo, shell, networkInterfaces] =
-    await Promise.all([
-      si.graphics(),
-      si.osInfo(),
-      si.shell(),
-      si.networkInterfaces(),
-    ]);
+  const [gpuInfo, osInfo, shell, networkInterfaces] = await Promise.all([
+    si.graphics(),
+    si.osInfo(),
+    si.shell(),
+    si.networkInterfaces(),
+  ]);
 
   const statsMessage = `
-\`System Monitor\`
+    \`System Monitor\`
 
-OS: ${osInfo.distro} ${osInfo.kernel}
-CPU: ${stats.cpu[0].model}
-GPU: ${gpuInfo.controllers.map((c) => c.model).join(", ")}
-RAM: ${(stats.usedMemory / 1024 ** 3).toFixed(2)} GB / ${(stats.totalMemory / 1024 ** 3).toFixed(2)} GB
-VRAM: ${gpuInfo.controllers.map((c) => c.vram).join(", ")} MB
-Shell: ${shell}
-Network: ${networkInterfaces.map((iface) => `${iface.iface} ${iface.speed} Mbps`).join(", ")}
-Commands: ${Object.keys(commands).length}
+    OS: ${osInfo.distro} ${osInfo.kernel}
+    CPU: ${stats.cpu[0].model}
+    LA: ${os
+      .loadavg()
+      .map((n) => n.toFixed(2))
+      .join(", ")}
+    GPU: ${gpuInfo.controllers.map((c) => c.model).join(", ")}
+    RAM: ${(stats.usedMemory / 1024 ** 3).toFixed(2)} GB / ${(stats.totalMemory / 1024 ** 3).toFixed(2)} GB
+    VRAM: ${gpuInfo.controllers.map((c) => c.vram).join(", ")} MB
+    Shell: ${shell}
+    Network: ${networkInterfaces.map((iface) => `${iface.iface} ${iface.speed} Mbps`).join(", ")}
 
-\`Node.js Runtime\`
-Node: ${nodeStats.nodeVersion} on ${nodeStats.platform}
-Uptime: ${nodeStats.uptime}
-Memory: ${nodeStats.heapUsed} MB / ${nodeStats.heapTotal} MB (RSS: ${nodeStats.rss} MB)
-External: ${nodeStats.external} MB, ArrayBuffers: ${nodeStats.arrayBuffers} MB
-CPU Time: User ${nodeStats.cpuUser} ms | System ${nodeStats.cpuSystem} ms
+    \`Node.js Runtime\`
+
+    Node.js: ${nodeStats.nodeVersion} on ${nodeStats.platform}
+    Uptime: ${timestamp(nodeStats.uptime)}
+    Memory: ${nodeStats.heapUsed} MB / ${nodeStats.heapTotal} MB (RSS: ${nodeStats.rss} MB)
+    External: ${nodeStats.external} MB, ArrayBuffers: ${nodeStats.arrayBuffers} MB
+    CPU Time: User ${nodeStats.cpuUser} ms | System ${nodeStats.cpuSystem} ms
+
+    \`${PROJECT_CANIS_ALIAS}\`
+
+    Commands: ${Object.keys(commands).length}
 `;
 
   await msg.reply(statsMessage);

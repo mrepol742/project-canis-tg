@@ -15,15 +15,15 @@ export default async function (msg: Message) {
   if (!/^uptime\b/i.test(msg.body)) return;
 
   const statsMessage = `
-      \`${timestamp(process.uptime())}\`
+    \`${timestamp(process.uptime())}\`
 
-      ID: #${process.pid}
-      LA: ${os
-        .loadavg()
-        .map((n) => n.toFixed(2))
-        .join(", ")}
-      Node.js: ${process.version}
-      `;
+    ID: #${process.pid}
+    LA: ${os
+      .loadavg()
+      .map((n) => n.toFixed(2))
+      .join(", ")}
+    Node.js: ${process.version}
+  `;
 
   await msg.reply(statsMessage);
 }

@@ -13,7 +13,6 @@ export const info = {
 export default async function (msg: Message) {
   if (!/^8ball\b/i.test(msg.body)) return;
 
-  const response = ball[Math.floor(Math.random() * ball.length)];
-  if (response.length === 0) return await msg.reply("The ball is silent...");
+  const response = ball[Math.floor(Math.random() * ball.length)]
   await msg.reply(response);
 }

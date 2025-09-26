@@ -1,4 +1,4 @@
-import { Message } from "../../types/message"
+import { Message } from "../../types/message";
 import axios from "../components/axios";
 import log from "../components/utils/log";
 
@@ -19,7 +19,7 @@ export default async function (msg: Message) {
   }
 
   const response = await axios.get(
-    `https://huggingface.co/api/models?search=${query}`
+    `https://huggingface.co/api/models?search=${query}`,
   );
 
   if (response.data.length === 0) {
@@ -28,16 +28,16 @@ export default async function (msg: Message) {
   }
   const models = response.data[0];
   const info = `
-      \`${models.modelId}\`
-      ${models.tags.splice(0, 5).join(", ") || "N/A"}
+    \`${models.modelId}\`
+    ${models.tags.splice(0, 5).join(", ") || "N/A"}
 
-      Library: ${models.library_name}
-      Pipeline: ${models.pipeline_tag}
-      Likes: ${models.likes}
-      Downloads: ${models.downloads}
-      Created At: ${new Date(models.createdAt).toLocaleString()}
-      Private: ${models.private ? "Yes" : "No"}
-      Model URL: https://huggingface.co/${models.modelId}
-      `;
+    Library: ${models.library_name}
+    Pipeline: ${models.pipeline_tag}
+    Likes: ${models.likes}
+    Downloads: ${models.downloads}
+    Created At: ${new Date(models.createdAt).toLocaleString()}
+    Private: ${models.private ? "Yes" : "No"}
+    Model URL: https://huggingface.co/${models.modelId}
+  `;
   await msg.reply(info);
 }

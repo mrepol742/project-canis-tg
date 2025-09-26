@@ -4,5 +4,3 @@ dist
 .session
 *.log
 *.env
-
-/src/generated/prisma

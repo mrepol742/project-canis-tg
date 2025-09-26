@@ -60,6 +60,34 @@ Canis supports multiple AI providers out of the box:
 5. **Run**
 
    ```sh
+   npm run dev
+   ```
+
+#### PM2
+
+1. **Build**
+
+   ```
+   npm run build
+   ```
+
+2. **Start**
+
+   ```
+   pm2 start ecosystem.config.js
+   ```
+
+#### NodeJS
+
+1. **Build**
+
+   ```
+   npm run build
+   ```
+
+2. **Start**
+
+   ```
    npm run start
    ```
 

@@ -1,6 +1,6 @@
 {
   "name": "project-canis-tg",
-  "version": "12.0.0",
+  "version": "12.1.0",
   "description": "Canis Major and the constellation Canis Minor, the “lesser dog,” are widely regarded as two hunting hounds that follow Orion, the great hunter of ancient Greek legends.",
   "private": true,
   "main": "src/index.ts",
@@ -14,7 +14,7 @@
     "email": "mrepol742@gmail.com",
     "url": "https://mrepol742.github.io"
   },
-  "license": "SEE LICENSE IN https://github.com/mrepol742/project-canis-tg/",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/mrepol742/project-canis-tg.git"

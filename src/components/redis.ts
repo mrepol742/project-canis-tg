@@ -1,16 +1,25 @@
-import { createClient } from "redis";
+import { createClient, type RedisClientType } from "redis";
 import log from "./utils/log";
 
-const redis = createClient({
-  url: process.env.REDIS_URL || "redis://localhost:6379",
-  socket: {
-    connectTimeout: 30000, // 30 seconds
-    reconnectStrategy: (retries) => Math.min(retries * 100, 3000),
-  },
-});
+declare global {
+  var _sharedRedis: RedisClientType;
+}
 
-redis.on("error", (err) => log.error("Redis", err));
+if (!global._sharedRedis) {
+  const client: RedisClientType = createClient({
+    url: process.env.REDIS_URL || "redis://localhost:6379",
+    socket: {
+      connectTimeout: 30000,
+      reconnectStrategy: (retries) => Math.min(retries * 100, 3000),
+    },
+  });
 
-redis.connect();
+  client.on("error", (err) => log.error("Redis", err));
 
+  client.connect().catch((err) => log.error("Redis connection error", err));
+
+  global._sharedRedis = client;
+}
+
+const redis = global._sharedRedis;
 export default redis;

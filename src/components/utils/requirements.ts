@@ -2,11 +2,11 @@ import { execSync } from "child_process";
 import * as process from "process";
 import semver from "semver";
 import log from "./log";
-import url from "url";
+import redis from "../redis";
 
 function checkNodeVersion() {
   const current = process.versions.node;
-  const required = ">=24.0.0";
+  const required = ">=18.0.0";
   if (!semver.satisfies(current, required)) {
     log.warn("Node", `Node.js ${required} required, found ${current}`);
   } else {
@@ -14,25 +14,13 @@ function checkNodeVersion() {
   }
 }
 
-function checkMySQL() {
-  const dbUrl = process.env.DATABASE_URL || "mysql://root@127.0.0.1:3306";
-  try {
-    const version = execSync("mariadb --version").toString().trim();
-    log.info("MySQL", version);
-  } catch {
-    log.error(
-      "MySQL",
-      "MySQL is required but not found (install mysql-client or ensure server is accessible).",
-    );
-    process.exit(1);
-  }
-}
-
-function checkRedis() {
+async function checkRedis() {
   const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";
   try {
-    const version = execSync("redis-cli --version").toString().trim();
-    log.info("Redis", version);
+    const start = Date.now();
+    await redis.ping();
+    const end = Date.now() - start;
+    log.info("Redis", `Ping ${end}ms at ${redisUrl}`);
   } catch {
     log.error(
       "Redis",
@@ -57,7 +45,6 @@ function checkFFMPEG() {
 export function checkRequirements() {
   log.info("Requirements", "Checking bot requirements...");
   checkNodeVersion();
-  checkMySQL();
   checkRedis();
   checkFFMPEG();
   log.info("Requirements", "Bot requirements check complete.");

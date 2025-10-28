@@ -1,35 +1,32 @@
 import log from "./utils/log";
+import redis from "./redis";
 
-process.on("SIGHUP", function () {
-  process.exit(0);
-});
+async function gracefulShutdown(signal: string): Promise<void> {
+  log.info("Process", `Received ${signal}, shutting down...`);
 
-process.on("SIGTERM", function () {
-  process.exit(0);
-});
+  try {
+    redis.sendCommand(["SAVE"]);
+    await Promise.allSettled([redis.quit()]);
+  } catch (err) {
+    log.error("Browser", `Error closing browser: ${(err as Error).message}`);
+  } finally {
+    process.exit(0);
+  }
+}
 
-process.on("SIGINT", function () {
-  process.kill(process.pid);
-  process.exit(0);
+["SIGINT", "SIGTERM", "SIGHUP"].forEach((signal) => {
+  process.on(signal, async () => await gracefulShutdown(signal));
 });
 
 process.on("uncaughtException", (err, origin) => {
   log.error(
-    "Uncaught Exception",
-    `Exception: ${err.message}\nOrigin: ${origin}`
+    "UncaughtException",
+    `Exception: ${err.message}\nOrigin: ${origin}`,
   );
 });
 
 process.on("unhandledRejection", (reason, promise) => {
-  log.error("Unhandled Rejection", `Reason: ${reason}\nPromise: ${promise}`);
-});
-
-process.on("beforeExit", (code) => {
-  log.info("Before Exit", `Process is about to exit with code: ${code}`);
-});
-
-process.on("exit", (code) => {
-  console.log("");
+  log.error("UnhandledRejection", `Reason: ${reason}\nPromise: ${promise}`);
 });
 
 log.info("Process", "Event listeners for process signals have been set up.");

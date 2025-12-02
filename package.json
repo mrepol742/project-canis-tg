@@ -24,22 +24,22 @@
     "email": "mrepol742@gmail.com"
   },
   "dependencies": {
-    "@google/genai": "^1.19.0",
-    "@openrouter/ai-sdk-provider": "^0.7.2",
-    "@prisma/client": "^6.12.0",
+    "@google/genai": "^1.30.0",
+    "@openrouter/ai-sdk-provider": "^0.7.5",
+    "@prisma/client": "^6.19.0",
     "ai": "^4.3.19",
-    "axios": "^1.10.0",
+    "axios": "^1.13.2",
     "cli-progress": "^3.12.0",
-    "dotenv": "^17.2.0",
+    "dotenv": "^17.2.3",
     "fb-downloader-scrapper": "^3.0.1",
     "google-tts-api": "^2.0.2",
     "groq-sdk": "^0.27.0",
     "npmlog": "^7.0.1",
-    "ollama": "^0.5.17",
-    "openai": "^5.20.1",
-    "redis": "^5.6.0",
-    "semver": "^7.7.2",
-    "systeminformation": "^5.27.7",
+    "ollama": "^0.5.18",
+    "openai": "^5.23.2",
+    "redis": "^5.10.0",
+    "semver": "^7.7.3",
+    "systeminformation": "^5.27.11",
     "telegram": "^2.26.22",
     "youtubei.js": "^14.0.0"
   },
@@ -53,7 +53,7 @@
     "ts-node": "^10.9.2",
     "tsc-alias": "^1.8.16",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.3"
   },
   "engines": {
     "node": ">=18.x"

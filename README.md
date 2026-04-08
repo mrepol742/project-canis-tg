@@ -24,11 +24,33 @@ Canis supports multiple AI providers out of the box:
 
 - Node.js (>=18.x)
 - MySQL
-
-  You can changed the db provider in `prisma/schema.prisma`
-
 - Redis/Valkey
 - Telegram Account
+
+##  Skip through this long setup and use NPX
+If you want to skip the setup and just want to run the bot, you can use NPX to run the bot without cloning the repo or installing dependencies.
+
+```sh
+npx project-canis-tg
+```
+
+Once you install the bot using NPX, you configure the required environment variables in the `.env.example` using this command
+```sh
+# Your bot name goes here
+export PROJECT_CANIS_ALIAS=Canis
+
+# the Telegram API ID and hash for your bot
+export TELEGRAM_API_ID=
+# the Telegram API hash for your bot
+export TELEGRAM_API_HASH=
+# for more configuration, please refer to the .env.example file
+```
+
+Alternatively, you can also run the bot using this short command:
+```sh
+npx canis-tg
+```
+
 
 ## Getting started
 

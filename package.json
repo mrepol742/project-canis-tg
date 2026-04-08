@@ -2,12 +2,15 @@
   "name": "project-canis-tg",
   "version": "12.1.0",
   "description": "Canis Major and the constellation Canis Minor, the “lesser dog,” are widely regarded as two hunting hounds that follow Orion, the great hunter of ancient Greek legends.",
-  "private": true,
   "main": "src/index.ts",
   "scripts": {
     "build": "tsc && tsc-alias",
     "start": "clear && while [ true ]; do node dist/index.js ; done",
     "dev": "clear && while [ true ]; do ts-node -r tsconfig-paths/register src/index.ts ; done"
+  },
+  "bin": {
+    "project-canis-tg": "./dist/index.js",
+    "canis-tg": "./dist/index.js"
   },
   "author": {
     "name": "Melvin Jones Repol",
